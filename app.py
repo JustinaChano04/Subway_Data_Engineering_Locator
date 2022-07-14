@@ -1,6 +1,7 @@
+import sys
 from ensurepip import bootstrap
 from re import L
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from sqlalchemy.sql import text
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
@@ -43,6 +44,38 @@ class subways(db.Model):
 def ak_subway(state):
     subway = subways.query.filter_by(state=state).all()
     return render_template('list.html', subway=subway, state=state)
+
+@app.route('/', methods = ['GET','POST'])
+def input_state():
+        test = request.args.get('state_select')
+        if test is None:
+            return render_template('list.html', state = test)
+        else:
+            return redirect(url_for('state_query', state=test))
+
+    # if request.method == 'GET':
+    #     test = request.args.get('state_select')
+    #     print('52', test, file=sys.stderr)
+    #     if test is None:
+    #         return render_template('list.html', state = test)
+    #     else:
+    #         print('56', file=sys.stderr)
+    #         return redirect(url_for('state_query', state=test))
+    # else:
+    #     return render_template('list.html')
+
+
+# def show_state(state):
+#     subway = subways.query.filter_by(state=state).all()
+#     return render_template('list.html', subway=subway, state=state)
+@app.route('/state_query/<state>')
+def state_query(state):
+    print(state, file=sys.stderr)
+    subway = subways.query.filter_by(state=state)
+    # subway = subways.query.with_entities(subways.city).filter_by(state=state)
+    # print('52', subway, file=sys.stderr)
+
+    return render_template('list1.html', subway=subway, state=state)
 
 if __name__ == '__main__':
     boostrap = Bootstrap(app)
